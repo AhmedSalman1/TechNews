@@ -1,19 +1,20 @@
+import { CreatePostReq, CreatePostRes, GetPostsReq, GetPostsRes } from '../api';
 import { db } from '../datastore';
 import { CustomHandler, Post } from '../types';
 import crypto from 'crypto';
 
-export const getAllPosts: CustomHandler<{}, {}> = (req, res) => {
+export const getAllPosts: CustomHandler<GetPostsReq, GetPostsRes> = (
+  req,
+  res,
+) => {
+  // throw new Error('oops');
   res.status(200).json({
     posts: db.getPosts(),
   });
 };
 
-type createPostReq = Pick<Post, 'title' | 'url' | 'userId'>;
-
-interface createPostRes {}
-
 // We don't need all fields
-export const createPost: CustomHandler<createPostReq, createPostRes> = (
+export const createPost: CustomHandler<CreatePostReq, CreatePostRes> = (
   req,
   res,
 ) => {
