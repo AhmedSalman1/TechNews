@@ -1,15 +1,16 @@
 import express, { ErrorRequestHandler } from 'express';
 import morgan from 'morgan';
 import { createPost, getAllPosts } from './controllers/postController';
+import asyncHandler from 'express-async-handler';
 
 const app = express();
 
 app.use(express.json());
 app.use(morgan('dev'));
 
-app.get('/v1/posts', getAllPosts);
+app.get('/v1/posts', asyncHandler(getAllPosts));
 
-app.post('/v1/posts', createPost);
+app.post('/v1/posts', asyncHandler(createPost));
 
 const errHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.error(err);
