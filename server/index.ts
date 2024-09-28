@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import { createPost, getAllPosts } from './controllers/postController';
 import asyncHandler from 'express-async-handler';
 import { initDb } from './datastore';
+import { signIn, signUp } from './controllers/userController';
 
 (async () => {
   await initDb();
@@ -12,8 +13,10 @@ import { initDb } from './datastore';
   app.use(morgan('dev'));
 
   app.get('/v1/posts', asyncHandler(getAllPosts));
-
   app.post('/v1/posts', asyncHandler(createPost));
+
+  app.post('/v1/signup', asyncHandler(signUp));
+  app.post('/v1/signin', asyncHandler(signIn));
 
   const errHandler: ErrorRequestHandler = (err, req, res, next) => {
     console.error(err);
