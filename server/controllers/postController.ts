@@ -35,7 +35,5 @@ export const createPost: CustomHandler<CreatePostReq, CreatePostRes> = async (
   };
 
   await db.createPost(post);
-  res.status(200).json({
-    success: true,
-  });
+  res.status(200);
 };

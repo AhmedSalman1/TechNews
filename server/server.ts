@@ -3,14 +3,19 @@ import morgan from 'morgan';
 import { createPost, getAllPosts } from './controllers/postController';
 import asyncHandler from 'express-async-handler';
 import { initDb } from './datastore';
-import { signIn, signUp } from './controllers/userController';
+import { signIn, signUp } from './controllers/authController';
+import { loggerMiddleware } from './middleware/loggerMiddleware';
+import { errHandler } from './middleware/errorMiddleware';
+import dotenv from 'dotenv';
 
 (async () => {
   await initDb();
   const app = express();
+  dotenv.config();
 
   app.use(express.json());
   app.use(morgan('dev'));
+  app.use(loggerMiddleware);
 
   app.get('/v1/posts', asyncHandler(getAllPosts));
   app.post('/v1/posts', asyncHandler(createPost));
@@ -18,12 +23,6 @@ import { signIn, signUp } from './controllers/userController';
   app.post('/v1/signup', asyncHandler(signUp));
   app.post('/v1/signin', asyncHandler(signIn));
 
-  const errHandler: ErrorRequestHandler = (err, req, res, next) => {
-    console.error(err);
-    return res.status(500).json({
-      error: 'an unexpected error occurred, please try again',
-    });
-  };
   app.use(errHandler);
 
   app.listen(3000, () => {
