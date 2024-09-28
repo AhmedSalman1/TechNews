@@ -22,18 +22,33 @@ export class SqliteDataStore implements Datastore {
     return this;
   }
 
-  createUser(user: User): Promise<void> {
-    throw new Error('Method not implemented.');
+  async createUser(user: User): Promise<void> {
+    await this.db.run(
+      'INSERT INTO users (id, firstName, lastName, password, username, email) VALUES (?, ?, ?, ?, ?, ?)',
+      user.id,
+      user.firstName,
+      user.lastName,
+      user.password,
+      user.username,
+      user.email,
+    );
   }
+
   getUserById(id: string): Promise<User | undefined> {
     throw new Error('Method not implemented.');
   }
+
   getUserByEmail(email: string): Promise<User | undefined> {
-    throw new Error('Method not implemented.');
+    return this.db.get<User>(`SELECT * FROM users WHERE email = ?`, email);
   }
+
   getUserByUsername(username: string): Promise<User | undefined> {
-    throw new Error('Method not implemented.');
+    return this.db.get<User>(
+      `SELECT * FROM users WHERE username = ?`,
+      username,
+    );
   }
+
   getPosts(): Promise<Post[]> {
     return this.db.all<Post[]>('SELECT * FROM posts;');
   }

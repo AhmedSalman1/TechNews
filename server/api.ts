@@ -36,6 +36,22 @@ export interface GetAllLikesRes {
 }
 
 // User APIs
+export type SignUpReq = Pick<
+  User,
+  'firstName' | 'lastName' | 'username' | 'email' | 'password'
+>;
+export interface SignUpRes {}
+
+export interface SignInReq {
+  login: string; // username or email
+  password: string;
+}
+
+export type SignInRes = Pick<
+  User,
+  'firstName' | 'lastName' | 'username' | 'email' | 'id'
+>;
+
 export interface GetUserReq {}
 export type GetUserRes = Pick<
   User,
