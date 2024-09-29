@@ -40,17 +40,19 @@ export type SignUpReq = Pick<
   User,
   'firstName' | 'lastName' | 'username' | 'email' | 'password'
 >;
-export interface SignUpRes {}
+export interface SignUpRes {
+  jwt: string;
+}
 
 export interface SignInReq {
   login: string; // username or email
   password: string;
 }
 
-export type SignInRes = Pick<
-  User,
-  'firstName' | 'lastName' | 'username' | 'email' | 'id'
->;
+export type SignInRes = {
+  user: Pick<User, 'firstName' | 'lastName' | 'username' | 'email' | 'id'>;
+  jwt: string;
+};
 
 export interface GetUserReq {}
 export type GetUserRes = Pick<
