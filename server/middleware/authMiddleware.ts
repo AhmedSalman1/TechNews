@@ -19,6 +19,8 @@ export const authMiddleware: CustomHandler<any, any> = async (
       throw 'Not found';
     }
 
+    res.locals.userId = user.id;
+
     next();
   } catch {
     return res.status(401).send({ error: 'Bad token' });
