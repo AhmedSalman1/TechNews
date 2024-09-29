@@ -7,6 +7,7 @@ import { signIn, signUp } from './controllers/authController';
 import { loggerMiddleware } from './middleware/loggerMiddleware';
 import { errHandler } from './middleware/errorMiddleware';
 import dotenv from 'dotenv';
+import { authMiddleware } from './middleware/authMiddleware';
 
 (async () => {
   await initDb();
@@ -17,11 +18,13 @@ import dotenv from 'dotenv';
   app.use(morgan('dev'));
   app.use(loggerMiddleware);
 
-  app.get('/v1/posts', asyncHandler(getAllPosts));
-  app.post('/v1/posts', asyncHandler(createPost));
-
   app.post('/v1/signup', asyncHandler(signUp));
   app.post('/v1/signin', asyncHandler(signIn));
+
+  app.use(authMiddleware);
+
+  app.get('/v1/posts', asyncHandler(getAllPosts));
+  app.post('/v1/posts', asyncHandler(createPost));
 
   app.use(errHandler);
 

@@ -35,7 +35,7 @@ export class SqliteDataStore implements Datastore {
   }
 
   getUserById(id: string): Promise<User | undefined> {
-    throw new Error('Method not implemented.');
+    return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
   }
 
   getUserByEmail(email: string): Promise<User | undefined> {
