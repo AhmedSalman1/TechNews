@@ -10,9 +10,6 @@
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist"
   },
-  "engines": {
-    "node": "18.x"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {
