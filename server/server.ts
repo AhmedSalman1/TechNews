@@ -18,6 +18,7 @@ import { authMiddleware } from './middleware/authMiddleware';
   app.use(morgan('dev'));
   app.use(loggerMiddleware);
 
+  app.get('/healthz', (req, res) => res.send({ status: '✅' }));
   app.post('/v1/signup', asyncHandler(signUp));
   app.post('/v1/signin', asyncHandler(signIn));
 
@@ -28,7 +29,7 @@ import { authMiddleware } from './middleware/authMiddleware';
 
   app.use(errHandler);
 
-  app.listen(3000, () => {
+  app.listen(process.env.PORT || 3000, () => {
     console.log('Server running on port 3000');
   });
 })();
