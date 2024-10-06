@@ -65,16 +65,17 @@ export class SqliteDataStore implements Datastore {
   }
 
   async getPost(id: string): Promise<Post | undefined> {
-    return await this.db.get<Post>('SELECT * From posts where postId = ?', id);
+    return await this.db.get<Post>('SELECT * From posts where id = ?', id);
   }
 
   async deletePost(id: string): Promise<void> {
-    await this.db.run('Delete FROM posts WHERE id= ?', id);
+    await this.db.run('Delete FROM posts WHERE id = ?', id);
   }
 
   async createComment(comment: Comment): Promise<void> {
     await this.db.run(
-      'INSERT INTO Comments(userId,postId,comment,postedAt) VALUES(?,?,?,?)',
+      'INSERT INTO Comments(id, userId, postId, comment, postedAt) VALUES(?,?,?,?,?)',
+      comment.id,
       comment.userId,
       comment.postId,
       comment.comment,
@@ -84,18 +85,18 @@ export class SqliteDataStore implements Datastore {
 
   async getComments(postId: string): Promise<Comment[]> {
     return await this.db.all<Comment[]>(
-      'SELECT * FROM comments WHERE postId=?',
+      'SELECT * FROM comments WHERE postId = ?',
       postId,
     );
   }
 
   async deleteComment(id: string): Promise<void> {
-    await this.db.run('Delete FROM comments WHERE Id=?', id);
+    await this.db.run('DELETE FROM comments WHERE id = ?', id);
   }
 
   async createLike(like: Like): Promise<void> {
     await this.db.run(
-      'INSERT INTO Likes(userId,postId) VALUES(?,?)',
+      'INSERT INTO likes(userId,postId) VALUES(?,?)',
       like.userId,
       like.postId,
     );
@@ -104,7 +105,7 @@ export class SqliteDataStore implements Datastore {
   getLikes(postId: string): Promise<Like[]> {
     throw new Error('Method not implemented.');
   }
-  isDuplicateLike(like: Like): Promise<boolean> {
+  exists(like: Like): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }

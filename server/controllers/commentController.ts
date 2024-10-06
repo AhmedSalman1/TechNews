@@ -3,38 +3,57 @@ import {
   CreateCommentRes,
   DeleteCommentRes,
   DeleteCommentReq,
+  GetCommentsRes,
 } from '../api';
 import { db } from '../datastore';
-import { CustomHandler, Comment } from '../types';
+import { ExpressHandlerWithParams, Comment } from '../types';
 import crypto from 'crypto';
 
-export const createComment: CustomHandler<
+export const createComment: ExpressHandlerWithParams<
+  { postId: string },
   CreateCommentReq,
   CreateCommentRes
 > = async (req, res) => {
-  if (!req.body.postId) return res.status(400).send({ error: 'No Post Id' });
+  if (!req.body.postId)
+    return res.status(400).send({ error: 'Post ID is missing' });
 
-  if (!req.body.userId) return res.status(400).send({ error: 'No User Id' });
+  if (!req.body.comment)
+    return res.status(400).send({ error: 'Comment is missing' });
 
-  if (!req.body.comment) return res.status(400).send({ error: 'No Comment' });
+  if (!(await db.getPost(req.body.postId))) {
+    return res.status(404).send({ error: 'No post found with this ID' });
+  }
 
   const commentForInsertion: Comment = {
     id: crypto.randomUUID(),
     postedAt: Date.now(),
     postId: req.body.postId,
-    userId: req.body.userId,
+    userId: res.locals.userId,
     comment: req.body.comment,
   };
   await db.createComment(commentForInsertion);
   return res.sendStatus(200);
 };
 
-export const deleteComment: CustomHandler<
+export const deleteComment: ExpressHandlerWithParams<
+  { commentId: string },
   DeleteCommentReq,
   DeleteCommentRes
 > = async (req, res) => {
-  if (!req.body.commentId)
+  if (!req.params.commentId)
     return res.status(404).send({ error: 'No Comment Id' });
-  await db.deleteComment(req.body.commentId);
+  await db.deleteComment(req.params.commentId);
   return res.sendStatus(200);
+};
+
+export const getComments: ExpressHandlerWithParams<
+  { postId: string },
+  null,
+  GetCommentsRes
+> = async (req, res) => {
+  if (!req.params.postId) {
+    return res.status(400).send({ error: 'Post ID is missing' });
+  }
+  const comments = await db.getComments(req.params.postId);
+  return res.send({ comments });
 };

@@ -8,7 +8,7 @@ import {
   GetPostsRes,
 } from '../api';
 import { db } from '../datastore';
-import { CustomHandler, Post } from '../types';
+import { ExpressHandlerWithParams, CustomHandler, Post } from '../types';
 import crypto from 'crypto';
 
 export const getAllPosts: CustomHandler<GetPostsReq, GetPostsRes> = async (
@@ -55,11 +55,12 @@ export const deletePost: CustomHandler<DeletePostReq, DeletePostRes> = async (
   return res.sendStatus(200);
 };
 
-export const getPost: CustomHandler<DeletePostReq, GetPostRes> = async (
-  req,
-  res,
-) => {
-  if (!req.body.postId) return res.sendStatus(400);
-  const postToReturn: Post | undefined = await db.getPost(req.body.postId);
+export const getPost: ExpressHandlerWithParams<
+  { id: string },
+  null,
+  GetPostRes
+> = async (req, res) => {
+  if (!req.params.id) return res.sendStatus(400);
+  const postToReturn: Post | undefined = await db.getPost(req.params.id);
   return res.send({ post: postToReturn });
 };

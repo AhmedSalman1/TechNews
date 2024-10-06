@@ -13,7 +13,11 @@ import { loggerMiddleware } from './middleware/loggerMiddleware';
 import { errHandler } from './middleware/errorMiddleware';
 import dotenv from 'dotenv';
 import { authMiddleware } from './middleware/authMiddleware';
-import { createComment, deleteComment } from './controllers/commentController';
+import {
+  createComment,
+  deleteComment,
+  getComments,
+} from './controllers/commentController';
 import { getLikes, createLike } from './controllers/likeController';
 
 (async () => {
@@ -36,11 +40,12 @@ import { getLikes, createLike } from './controllers/likeController';
   app.get('/v1/posts/:id', asyncHandler(getPost));
   app.delete('/v1/posts/:id', asyncHandler(deletePost));
 
+  app.get('/v1/comments/:postId', asyncHandler(getComments));
   app.post('/v1/comments/new', asyncHandler(createComment));
-  app.delete('/v1/comments:id', asyncHandler(deleteComment));
+  app.delete('/v1/comments/:commentId', asyncHandler(deleteComment));
 
   app.get('/v1/likes/:postId', asyncHandler(getLikes));
-  app.post('/v1/likes/new', asyncHandler(createLike));
+  app.post('/v1/likes/:postId', asyncHandler(createLike));
 
   app.use(errHandler);
 

@@ -1,44 +1,48 @@
-import { CreateLikeReq, CreateLikeRes, GetLikesReq, GetLikesRes } from '../api';
+import { CreateLikeRes, GetLikesRes } from '../api';
 import { db } from '../datastore';
-import { CustomHandler, Like } from '../types';
+import { ExpressHandlerWithParams, Like } from '../types';
 
-export const createLike: CustomHandler<CreateLikeReq, CreateLikeRes> = async (
-  req,
-  res,
-) => {
-  if (!req.body.postId) {
-    return res.status(400).send({ error: 'No Post Id' });
+export const createLike: ExpressHandlerWithParams<
+  { postId: string },
+  null,
+  CreateLikeRes
+> = async (req, res) => {
+  if (!req.params.postId) {
+    return res.status(400).send({ error: 'Post ID is missing' });
   }
 
-  if (!req.body.userId) {
-    return res.status(400).send({ error: 'No User Id' });
+  if (!(await db.getPost(req.params.postId))) {
+    return res.status(404).send({ error: 'No post found with this ID' });
   }
 
-  let found = await db.isDuplicateLike({
-    postId: req.body.postId,
-    userId: req.body.userId,
+  let found = await db.exists({
+    postId: req.params.postId,
+    userId: res.locals.userId,
   });
   if (found) {
     return res
       .status(400)
-      .send({ error: 'No more likes for same post, same userid' });
+      .send({ error: 'No more likes for same post, same userId' });
   }
 
   //Valid like Object
   const likeForInsert: Like = {
-    postId: req.body.postId,
-    userId: req.body.userId,
+    postId: req.params.postId,
+    userId: res.locals.userId,
   };
 
   db.createLike(likeForInsert);
   return res.sendStatus(200);
 };
 
-export const getLikes: CustomHandler<GetLikesReq, GetLikesRes> = async (
-  request,
-  response,
-) => {
-  let params: any = request.params;
-  const likes: Like[] = await db.getLikes(params.postId);
-  return response.send({ likes: likes.length });
+export const getLikes: ExpressHandlerWithParams<
+  { postId: string },
+  null,
+  GetLikesRes
+> = async (req, res) => {
+  if (!req.params.postId) {
+    return res.status(400).send({ error: 'Post ID is missing' });
+  }
+  const likes: Like[] = await db.getLikes(req.params.postId);
+  return res.send({ likes: likes.length });
 };
