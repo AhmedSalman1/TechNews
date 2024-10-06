@@ -102,10 +102,21 @@ export class SqliteDataStore implements Datastore {
     );
   }
 
-  getLikes(postId: string): Promise<Like[]> {
-    throw new Error('Method not implemented.');
+  async getLikes(postId: string): Promise<number> {
+    let result = await this.db.get<{ count: number }>(
+      'SELECT COUNT(*) as count FROM likes WHERE postId = ?',
+      postId,
+    );
+    return result?.count ?? 0;
   }
-  exists(like: Like): Promise<boolean> {
-    throw new Error('Method not implemented.');
+
+  async exists(like: Like): Promise<boolean> {
+    let awaitResult = await this.db.get<number>(
+      'SELECT 1 FROM likes WHERE postId = ? and userId = ?',
+      like.postId,
+      like.userId,
+    );
+    let val: boolean = awaitResult === undefined ? false : true;
+    return val;
   }
 }

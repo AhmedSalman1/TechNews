@@ -43,6 +43,6 @@ export const getLikes: ExpressHandlerWithParams<
   if (!req.params.postId) {
     return res.status(400).send({ error: 'Post ID is missing' });
   }
-  const likes: Like[] = await db.getLikes(req.params.postId);
-  return res.send({ likes: likes.length });
+  const count: Number = await db.getLikes(req.params.postId);
+  return res.send({ likes: count });
 };

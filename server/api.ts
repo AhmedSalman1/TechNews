@@ -36,7 +36,7 @@ export type CreateLikeReq = Like;
 export interface CreateLikeRes {}
 export type GetLikesReq = { postId: string };
 export interface GetLikesRes {
-  likes: number;
+  likes: Number;
 }
 
 // User APIs
