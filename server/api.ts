@@ -21,7 +21,7 @@ export type DeletePostRes = {};
 export type CreateCommentReq = Pick<Comment, 'userId' | 'postId' | 'comment'>;
 export interface CreateCommentRes {}
 
-export type CountCommentsReq = { postId: string | undefined };
+export type CountCommentsReq = { postId: string };
 export type CountCommentsRes = { count: number };
 
 export interface GetCommentsRes {

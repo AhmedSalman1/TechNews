@@ -1,6 +1,11 @@
 import express, { ErrorRequestHandler } from 'express';
 import morgan from 'morgan';
-import { createPost, getAllPosts } from './controllers/postController';
+import {
+  createPost,
+  deletePost,
+  getAllPosts,
+  getPost,
+} from './controllers/postController';
 import asyncHandler from 'express-async-handler';
 import { initDb } from './datastore';
 import { signIn, signUp } from './controllers/authController';
@@ -8,6 +13,8 @@ import { loggerMiddleware } from './middleware/loggerMiddleware';
 import { errHandler } from './middleware/errorMiddleware';
 import dotenv from 'dotenv';
 import { authMiddleware } from './middleware/authMiddleware';
+import { createComment, deleteComment } from './controllers/commentController';
+import { getLikes, createLike } from './controllers/likeController';
 
 (async () => {
   await initDb();
@@ -18,7 +25,7 @@ import { authMiddleware } from './middleware/authMiddleware';
   app.use(morgan('dev'));
   app.use(loggerMiddleware);
 
-  app.get('/healthz', (req, res) => res.send({ status: '✅' }));
+  // app.get('/healthz', (req, res) => res.send({ status: '✅' }));
   app.post('/v1/signup', asyncHandler(signUp));
   app.post('/v1/signin', asyncHandler(signIn));
 
@@ -26,6 +33,14 @@ import { authMiddleware } from './middleware/authMiddleware';
 
   app.get('/v1/posts', asyncHandler(getAllPosts));
   app.post('/v1/posts', asyncHandler(createPost));
+  app.get('/v1/posts/:id', asyncHandler(getPost));
+  app.delete('/v1/posts/:id', asyncHandler(deletePost));
+
+  app.post('/v1/comments/new', asyncHandler(createComment));
+  app.delete('/v1/comments:id', asyncHandler(deleteComment));
+
+  app.get('/v1/likes/:postId', asyncHandler(getLikes));
+  app.post('/v1/likes/new', asyncHandler(createLike));
 
   app.use(errHandler);
 

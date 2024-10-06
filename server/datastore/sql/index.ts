@@ -64,24 +64,43 @@ export class SqliteDataStore implements Datastore {
     );
   }
 
-  getPost(id: string): Promise<Post | undefined> {
-    throw new Error('Method not implemented.');
+  async getPost(id: string): Promise<Post | undefined> {
+    return await this.db.get<Post>('SELECT * From posts where postId = ?', id);
   }
-  deletePost(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async deletePost(id: string): Promise<void> {
+    await this.db.run('Delete FROM posts WHERE id= ?', id);
   }
-  createComment(comment: Comment): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async createComment(comment: Comment): Promise<void> {
+    await this.db.run(
+      'INSERT INTO Comments(userId,postId,comment,postedAt) VALUES(?,?,?,?)',
+      comment.userId,
+      comment.postId,
+      comment.comment,
+      comment.postedAt,
+    );
   }
-  getComments(postId: string): Promise<Comment[]> {
-    throw new Error('Method not implemented.');
+
+  async getComments(postId: string): Promise<Comment[]> {
+    return await this.db.all<Comment[]>(
+      'SELECT * FROM comments WHERE postId=?',
+      postId,
+    );
   }
-  deleteComment(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async deleteComment(id: string): Promise<void> {
+    await this.db.run('Delete FROM comments WHERE Id=?', id);
   }
-  createLike(like: Like): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async createLike(like: Like): Promise<void> {
+    await this.db.run(
+      'INSERT INTO Likes(userId,postId) VALUES(?,?)',
+      like.userId,
+      like.postId,
+    );
   }
+
   getLikes(postId: string): Promise<Like[]> {
     throw new Error('Method not implemented.');
   }

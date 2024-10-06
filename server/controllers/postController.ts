@@ -1,4 +1,12 @@
-import { CreatePostReq, CreatePostRes, GetPostsReq, GetPostsRes } from '../api';
+import {
+  CreatePostReq,
+  CreatePostRes,
+  DeletePostReq,
+  DeletePostRes,
+  GetPostRes,
+  GetPostsReq,
+  GetPostsRes,
+} from '../api';
 import { db } from '../datastore';
 import { CustomHandler, Post } from '../types';
 import crypto from 'crypto';
@@ -36,4 +44,22 @@ export const createPost: CustomHandler<CreatePostReq, CreatePostRes> = async (
 
   await db.createPost(post);
   res.sendStatus(200);
+};
+
+export const deletePost: CustomHandler<DeletePostReq, DeletePostRes> = async (
+  req,
+  res,
+) => {
+  if (!req.body.postId) return res.sendStatus(400);
+  db.deletePost(req.body.postId);
+  return res.sendStatus(200);
+};
+
+export const getPost: CustomHandler<DeletePostReq, GetPostRes> = async (
+  req,
+  res,
+) => {
+  if (!req.body.postId) return res.sendStatus(400);
+  const postToReturn: Post | undefined = await db.getPost(req.body.postId);
+  return res.send({ post: postToReturn });
 };
