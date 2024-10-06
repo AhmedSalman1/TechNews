@@ -82,4 +82,10 @@ export class SqliteDataStore implements Datastore {
   createLike(like: Like): Promise<void> {
     throw new Error('Method not implemented.');
   }
+  getLikes(postId: string): Promise<Like[]> {
+    throw new Error('Method not implemented.');
+  }
+  isDuplicateLike(like: Like): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
 }
