@@ -34,6 +34,16 @@ export class SqliteDataStore implements Datastore {
     );
   }
 
+  async updateCurrentUser(user: Partial<User>): Promise<void> {
+    await this.db.run(
+      'UPDATE users SET firstName = ?, lastName = ?, username = ? WHERE id = ?',
+      user.firstName,
+      user.lastName,
+      user.username,
+      user.id,
+    );
+  }
+
   getUserById(id: string): Promise<User | undefined> {
     return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
   }

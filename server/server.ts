@@ -9,7 +9,7 @@ import {
 } from './controllers/postController';
 import asyncHandler from 'express-async-handler';
 import { initDb } from './datastore';
-import { signIn, signUp } from './controllers/authController';
+import { getMe, signIn, signUp, updateMe } from './controllers/authController';
 import { loggerMiddleware } from './middleware/loggerMiddleware';
 import { errHandler } from './middleware/errorMiddleware';
 import dotenv from 'dotenv';
@@ -36,6 +36,8 @@ import { getLikes, createLike, deleteLike } from './controllers/likeController';
   app.post('/v1/signin', asyncHandler(signIn));
 
   app.use(authMiddleware);
+  app.get('/v1/me', asyncHandler(getMe));
+  app.patch('/v1/me', asyncHandler(updateMe));
 
   app.get('/v1/posts', asyncHandler(getAllPosts));
   app.post('/v1/posts', asyncHandler(createPost));
