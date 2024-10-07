@@ -34,6 +34,16 @@ export class SqliteDataStore implements Datastore {
     );
   }
 
+  async updateCurrentUser(user: Partial<User>): Promise<void> {
+    await this.db.run(
+      'UPDATE users SET firstName = ?, lastName = ?, username = ? WHERE id = ?',
+      user.firstName,
+      user.lastName,
+      user.username,
+      user.id,
+    );
+  }
+
   getUserById(id: string): Promise<User | undefined> {
     return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
   }
@@ -64,28 +74,97 @@ export class SqliteDataStore implements Datastore {
     );
   }
 
-  getPost(id: string): Promise<Post | undefined> {
-    throw new Error('Method not implemented.');
+  async getPost(id: string, userId: string): Promise<Post | undefined> {
+    return await this.db.get<Post>(
+      `SELECT *, EXISTS(
+        SELECT 1 FROM likes WHERE likes.postId = ? AND likes.userId = ?
+      ) as liked FROM posts WHERE id = ?`,
+      id,
+      userId,
+      id,
+    );
   }
-  deletePost(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async getPostByUrl(url: string): Promise<Post | undefined> {
+    return await this.db.get<Post>('SELECT * From posts where url = ?', url);
   }
-  createComment(comment: Comment): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async updatePost(post: Post): Promise<void> {
+    await this.db.run(
+      'UPDATE posts SET title = ?, url = ?, userId = ?, postedAt = ? WHERE id = ?',
+      post.title,
+      post.url,
+      post.userId,
+      post.postedAt,
+      post.id,
+    );
   }
-  getComments(postId: string): Promise<Comment[]> {
-    throw new Error('Method not implemented.');
+
+  async deletePost(id: string): Promise<void> {
+    await this.db.run('Delete FROM posts WHERE id = ?', id);
   }
-  deleteComment(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async createComment(comment: Comment): Promise<void> {
+    await this.db.run(
+      'INSERT INTO Comments(id, userId, postId, comment, postedAt) VALUES(?,?,?,?,?)',
+      comment.id,
+      comment.userId,
+      comment.postId,
+      comment.comment,
+      comment.postedAt,
+    );
   }
-  createLike(like: Like): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async getComments(postId: string): Promise<Comment[]> {
+    return await this.db.all<Comment[]>(
+      'SELECT * FROM comments WHERE postId = ?',
+      postId,
+    );
   }
-  getLikes(postId: string): Promise<Like[]> {
-    throw new Error('Method not implemented.');
+
+  async countComments(postId: string): Promise<number> {
+    let result = await this.db.get<{ count: number }>(
+      'SELECT COUNT(*) as count FROM comments WHERE postId = ?',
+      postId,
+    );
+    return result?.count ?? 0;
   }
-  isDuplicateLike(like: Like): Promise<boolean> {
-    throw new Error('Method not implemented.');
+
+  async deleteComment(id: string): Promise<void> {
+    await this.db.run('DELETE FROM comments WHERE id = ?', id);
+  }
+
+  async createLike(like: Like): Promise<void> {
+    await this.db.run(
+      'INSERT INTO likes(userId,postId) VALUES(?,?)',
+      like.userId,
+      like.postId,
+    );
+  }
+
+  async deleteLike(like: Like): Promise<void> {
+    await this.db.run(
+      'DELETE FROM likes WHERE userId = ? AND postId = ?',
+      like.userId,
+      like.postId,
+    );
+  }
+
+  async getLikes(postId: string): Promise<number> {
+    let result = await this.db.get<{ count: number }>(
+      'SELECT COUNT(*) as count FROM likes WHERE postId = ?',
+      postId,
+    );
+    return result?.count ?? 0;
+  }
+
+  async exists(like: Like): Promise<boolean> {
+    let awaitResult = await this.db.get<number>(
+      'SELECT 1 FROM likes WHERE postId = ? and userId = ?',
+      like.postId,
+      like.userId,
+    );
+    let val: boolean = awaitResult === undefined ? false : true;
+    return val;
   }
 }

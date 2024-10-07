@@ -14,6 +14,9 @@ export interface GetPostRes {
   post: Post;
 }
 
+export type UpdatePostReq = Pick<Post, 'id' | 'title' | 'url'>;
+export type UpdatePostRes = {};
+
 export type DeletePostReq = { postId: string };
 export type DeletePostRes = {};
 
@@ -21,7 +24,7 @@ export type DeletePostRes = {};
 export type CreateCommentReq = Pick<Comment, 'userId' | 'postId' | 'comment'>;
 export interface CreateCommentRes {}
 
-export type CountCommentsReq = { postId: string | undefined };
+export type CountCommentsReq = { postId: string };
 export type CountCommentsRes = { count: number };
 
 export interface GetCommentsRes {
@@ -36,7 +39,7 @@ export type CreateLikeReq = Like;
 export interface CreateLikeRes {}
 export type GetLikesReq = { postId: string };
 export interface GetLikesRes {
-  likes: number;
+  likes: Number;
 }
 
 // User APIs

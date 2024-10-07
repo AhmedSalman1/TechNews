@@ -1,5 +1,14 @@
 import crypto, { sign } from 'crypto';
-import { SignInReq, SignInRes, SignUpReq, SignUpRes } from '../api';
+import {
+  GetCurrentUserReq,
+  GetCurrentUserRes,
+  SignInReq,
+  SignInRes,
+  SignUpReq,
+  SignUpRes,
+  UpdateCurrentUserReq,
+  UpdateCurrentUserRes,
+} from '../api';
 import { db } from '../datastore';
 import { CustomHandler, User } from '../types';
 import { signJwt } from '../auth';
@@ -58,6 +67,61 @@ export const signUp: CustomHandler<SignUpReq, SignUpRes> = async (req, res) => {
     jwt,
   });
 };
+
+export const getMe: CustomHandler<
+  GetCurrentUserReq,
+  GetCurrentUserRes
+> = async (req, res) => {
+  const user = await db.getUserById(res.locals.userId);
+  if (!user) {
+    return res.sendStatus(500);
+  }
+
+  return res.send({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    username: user.username,
+    email: user.email,
+  });
+};
+
+export const updateMe: CustomHandler<
+  UpdateCurrentUserReq,
+  UpdateCurrentUserRes
+> = async (req, res) => {
+  const currentUserId = await res.locals.userId;
+  const { username } = req.body;
+
+  if (username && (await isDuplicateUserName(currentUserId, username))) {
+    return res.status(403).send({
+      error: 'Username already exists, try another one',
+    });
+  }
+
+  const currentUser = await db.getUserById(currentUserId);
+  if (!currentUser) {
+    return res.sendStatus(404).send({ error: 'User not found' });
+  }
+
+  await db.updateCurrentUser({
+    id: currentUserId,
+    username: username ?? currentUser.username,
+    firstName: req.body.firstName ?? currentUser.firstName,
+    lastName: req.body.lastName ?? currentUser.lastName,
+  });
+
+  return res.sendStatus(200);
+};
+
+async function isDuplicateUserName(
+  currentUserId: string,
+  newUsername: string,
+): Promise<boolean> {
+  const userWithUsername = await db.getUserByUsername(newUsername);
+
+  return userWithUsername != undefined && userWithUsername.id !== currentUserId;
+}
 
 function hashPassword(password: string) {
   return crypto

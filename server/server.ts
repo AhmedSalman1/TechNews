@@ -1,13 +1,14 @@
-import express, { ErrorRequestHandler } from 'express';
+import express from 'express';
 import morgan from 'morgan';
-import { createPost, getAllPosts } from './controllers/postController';
 import asyncHandler from 'express-async-handler';
 import { initDb } from './datastore';
-import { signIn, signUp } from './controllers/authController';
 import { loggerMiddleware } from './middleware/loggerMiddleware';
 import { errHandler } from './middleware/errorMiddleware';
 import dotenv from 'dotenv';
-import { authMiddleware } from './middleware/authMiddleware';
+import userRouter from './routes/userRoutes';
+import postRouter from './routes/postRoutes';
+import commentRouter from './routes/commentRoutes';
+import likeRouter from './routes/likeRoutes';
 
 (async () => {
   await initDb();
@@ -15,17 +16,17 @@ import { authMiddleware } from './middleware/authMiddleware';
   dotenv.config();
 
   app.use(express.json());
-  app.use(morgan('dev'));
-  app.use(loggerMiddleware);
+
+  if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+    app.use(loggerMiddleware);
+  }
 
   app.get('/healthz', (req, res) => res.send({ status: '✅' }));
-  app.post('/v1/signup', asyncHandler(signUp));
-  app.post('/v1/signin', asyncHandler(signIn));
-
-  app.use(authMiddleware);
-
-  app.get('/v1/posts', asyncHandler(getAllPosts));
-  app.post('/v1/posts', asyncHandler(createPost));
+  app.use('/v1/users', asyncHandler(userRouter));
+  app.use('/v1/posts', asyncHandler(postRouter));
+  app.use('/v1/comments', asyncHandler(commentRouter));
+  app.use('/v1/likes', asyncHandler(likeRouter));
 
   app.use(errHandler);
 

@@ -4,4 +4,5 @@ export interface CommentDao {
   createComment(comment: Comment): Promise<void>;
   getComments(postId: string): Promise<Comment[]>;
   deleteComment(id: string): Promise<void>;
+  countComments(postId: string): Promise<number>;
 }
