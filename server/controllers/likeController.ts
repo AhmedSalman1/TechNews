@@ -12,7 +12,7 @@ export const createLike: ExpressHandlerWithParams<
   }
 
   if (!(await db.getPost(req.params.postId))) {
-    return res.status(404).send({ error: 'No post found with this ID' });
+    return res.status(404).send({ error: 'Post Not Found' });
   }
 
   let found = await db.exists({
@@ -45,4 +45,25 @@ export const getLikes: ExpressHandlerWithParams<
   }
   const count: Number = await db.getLikes(req.params.postId);
   return res.send({ likes: count });
+};
+
+export const deleteLike: ExpressHandlerWithParams<
+  { postId: string },
+  null,
+  {}
+> = async (req, res) => {
+  if (!req.params.postId) {
+    return res.status(400).send({ error: 'Post ID is missing' });
+  }
+  if (!(await db.getPost(req.params.postId))) {
+    return res.status(404).send({ error: 'Post Not Found' });
+  }
+
+  const likeForDelete: Like = {
+    postId: req.params.postId,
+    userId: res.locals.userId,
+  };
+
+  db.deleteLike(likeForDelete);
+  return res.sendStatus(200);
 };

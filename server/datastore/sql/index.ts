@@ -64,8 +64,30 @@ export class SqliteDataStore implements Datastore {
     );
   }
 
-  async getPost(id: string): Promise<Post | undefined> {
-    return await this.db.get<Post>('SELECT * From posts where id = ?', id);
+  async getPost(id: string, userId: string): Promise<Post | undefined> {
+    return await this.db.get<Post>(
+      `SELECT *, EXISTS(
+        SELECT 1 FROM likes WHERE likes.postId = ? AND likes.userId = ?
+      ) as liked FROM posts WHERE id = ?`,
+      id,
+      userId,
+      id,
+    );
+  }
+
+  async getPostByUrl(url: string): Promise<Post | undefined> {
+    return await this.db.get<Post>('SELECT * From posts where url = ?', url);
+  }
+
+  async updatePost(post: Post): Promise<void> {
+    await this.db.run(
+      'UPDATE posts SET title = ?, url = ?, userId = ?, postedAt = ? WHERE id = ?',
+      post.title,
+      post.url,
+      post.userId,
+      post.postedAt,
+      post.id,
+    );
   }
 
   async deletePost(id: string): Promise<void> {
@@ -90,6 +112,14 @@ export class SqliteDataStore implements Datastore {
     );
   }
 
+  async countComments(postId: string): Promise<number> {
+    let result = await this.db.get<{ count: number }>(
+      'SELECT COUNT(*) as count FROM comments WHERE postId = ?',
+      postId,
+    );
+    return result?.count ?? 0;
+  }
+
   async deleteComment(id: string): Promise<void> {
     await this.db.run('DELETE FROM comments WHERE id = ?', id);
   }
@@ -97,6 +127,14 @@ export class SqliteDataStore implements Datastore {
   async createLike(like: Like): Promise<void> {
     await this.db.run(
       'INSERT INTO likes(userId,postId) VALUES(?,?)',
+      like.userId,
+      like.postId,
+    );
+  }
+
+  async deleteLike(like: Like): Promise<void> {
+    await this.db.run(
+      'DELETE FROM likes WHERE userId = ? AND postId = ?',
       like.userId,
       like.postId,
     );

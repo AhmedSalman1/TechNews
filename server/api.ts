@@ -14,6 +14,9 @@ export interface GetPostRes {
   post: Post;
 }
 
+export type UpdatePostReq = Pick<Post, 'id' | 'title' | 'url'>;
+export type UpdatePostRes = {};
+
 export type DeletePostReq = { postId: string };
 export type DeletePostRes = {};
 

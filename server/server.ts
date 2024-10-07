@@ -5,6 +5,7 @@ import {
   deletePost,
   getAllPosts,
   getPost,
+  updatePost,
 } from './controllers/postController';
 import asyncHandler from 'express-async-handler';
 import { initDb } from './datastore';
@@ -17,8 +18,9 @@ import {
   createComment,
   deleteComment,
   getComments,
+  countComments,
 } from './controllers/commentController';
-import { getLikes, createLike } from './controllers/likeController';
+import { getLikes, createLike, deleteLike } from './controllers/likeController';
 
 (async () => {
   await initDb();
@@ -38,14 +40,17 @@ import { getLikes, createLike } from './controllers/likeController';
   app.get('/v1/posts', asyncHandler(getAllPosts));
   app.post('/v1/posts', asyncHandler(createPost));
   app.get('/v1/posts/:id', asyncHandler(getPost));
+  app.patch('/v1/posts/:id', asyncHandler(updatePost));
   app.delete('/v1/posts/:id', asyncHandler(deletePost));
 
   app.get('/v1/comments/:postId', asyncHandler(getComments));
-  app.post('/v1/comments/new', asyncHandler(createComment));
+  app.get('/v1/comments/count/:postId', asyncHandler(countComments));
+  app.post('/v1/comments/:postId', asyncHandler(createComment));
   app.delete('/v1/comments/:commentId', asyncHandler(deleteComment));
 
   app.get('/v1/likes/:postId', asyncHandler(getLikes));
   app.post('/v1/likes/:postId', asyncHandler(createLike));
+  app.delete('/v1/likes/:postId', asyncHandler(deleteLike));
 
   app.use(errHandler);
 
