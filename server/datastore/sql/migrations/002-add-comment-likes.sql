@@ -5,7 +5,7 @@ CREATE TABLE comments (
   comment   VARCHAR NOT NULL,
   postedAt  INTEGER NOT NULL,
   FOREIGN KEY (userId) REFERENCES users(id),
-  FOREIGN KEY (postId) REFERENCES posts(id),
+  FOREIGN KEY (postId) REFERENCES posts(id)
 );
 
 CREATE TABLE likes (

@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.ts",
-    "start:prod": "set NODE_ENV=production&& nodemon server.ts",
-    "build": "rimraf dist && tsc",
+    "start:prod": "set NODE_ENV=production&& node ../dist/server.js",
+    "build": "tsc",
+    "postbuild": "cp -R datastore/sql/migrations ../dist/datastore/sql/migrations",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist"
   },
@@ -36,5 +37,8 @@
     "ts.check",
     "build",
     "add-build"
-  ]
+  ],
+  "engines": {
+    "node": "18.x"
+  }
 }
