@@ -10,10 +10,12 @@ import postRouter from './routes/postRoutes';
 import commentRouter from './routes/commentRoutes';
 import likeRouter from './routes/likeRoutes';
 
+dotenv.config();
+
+const app = express();
+
 (async () => {
   await initDb();
-  const app = express();
-  dotenv.config();
 
   app.use(express.json());
 
@@ -30,7 +32,11 @@ import likeRouter from './routes/likeRoutes';
 
   app.use(errHandler);
 
-  app.listen(process.env.PORT || 3000, () => {
-    console.log('Server running on port 3000');
-  });
+  if (require.main === module) {
+    app.listen(process.env.PORT || 3000, () => {
+      console.log('Server running on port 3000');
+    });
+  }
 })();
+
+export default app;
