@@ -5,6 +5,12 @@
 
 ---
 
+## Deployed Version
+
+Explore the live API here 👉🏻 : https://server-alpha-eight-79.vercel.app/healthz
+
+---
+
 ## Key Features
 
 - **Authentication and Authorization** 🚀
